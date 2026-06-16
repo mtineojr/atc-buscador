@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acelera tu Crecimiento — S01 C06</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Aptos Narrow', 'Nunito', 'Segoe UI', Arial, sans-serif;
+  background: #f2f3f5;
+  color: #1a1a1a;
+  font-size: 14px;
+}
+
+.header {
+  background: #DC582A;
+  color: white;
+  padding: 16px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 6px rgba(0,0,0,.2);
+}
+.header-logo {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: .4px;
+  line-height: 1.2;
+}
+.header-sub {
+  font-size: 11px;
+  opacity: .80;
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+/* Loading */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  color: #999;
+  gap: 14px;
+}
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid #eee;
+  border-top-color: #DC582A;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-msg {
+  text-align: center;
+  padding: 60px 20px;
+  color: #c0392b;
+  font-size: 14px;
+}
+.error-msg span { font-size: 36px; display: block; margin-bottom: 12px; }
+
+/* Filters */
+.filters-bar {
+  background: white;
+  padding: 14px 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  border-bottom: 1px solid #dde1e7;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+.fg {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 175px;
+  flex: 1;
+}
+.fg label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+}
+.fg select, .fg input {
+  padding: 7px 10px;
+  border: 1.5px solid #d0d5dd;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: #fafbfc;
+  color: #222;
+  outline: none;
+  transition: border-color .15s;
+}
+.fg select:focus, .fg input:focus {
+  border-color: #DC582A;
+  background: white;
+}
+.btn-clear {
+  padding: 7px 18px;
+  background: white;
+  border: 1.5px solid #ccc;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  color: #666;
+  white-space: nowrap;
+  align-self: flex-end;
+  transition: all .15s;
+}
+.btn-clear:hover { border-color: #DC582A; color: #DC582A; }
+
+/* Table */
+.tw { overflow-x: auto; padding-bottom: 48px; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+thead tr { background: #2c3345; color: white; }
+thead th {
+  padding: 11px 13px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+tbody tr { border-bottom: 1px solid #eaecf0; transition: background .1s; }
+tbody tr:hover { background: #fff4f0; }
+tbody tr:nth-child(even) { background: #f8f9fa; }
+tbody tr:nth-child(even):hover { background: #fff4f0; }
+td { padding: 9px 13px; white-space: nowrap; color: #2a2a2a; }
+
+.b {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .3px;
+}
+.bASP  { background: #dbeafe; color: #1d4ed8; }
+.bCEMS { background: #fce7f3; color: #9d174d; }
+.bPAG  { background: #dcfce7; color: #166534; }
+.bPEN  { background: #f1f5f9; color: #94a3b8; }
+.bPROC { background: #fef9c3; color: #854d0e; }
+.bSAF  { background: #dbeafe; color: #1e40af; }
+.bNOP  { background: #fee2e2; color: #991b1b; }
+.bJNR  { background: #ffedd5; color: #c2410c; }
+.bSSE  { background: #f3e8ff; color: #7e22ce; }
+.bSEN  { background: #e0e7ff; color: #3730a3; }
+.bREG  { background: #d1fae5; color: #065f46; }
+.bDEF  { background: #f1f5f9; color: #475569; }
+
+.nr {
+  text-align: center;
+  padding: 64px 20px;
+  color: #bbb;
+  font-size: 15px;
+}
+.nr span { font-size: 40px; display: block; margin-bottom: 12px; }
+
+/* hidden until data loads */
+.filters-bar, .tw { display: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-logo">Acelera tu Crecimiento</div>
+    <div class="header-sub">Consulta y Seguimiento</div>
+  </div>
+</div>
+
+<div id="loading" class="loading">
+  <div class="spinner"></div>
+  <div>Cargando datos...</div>
+</div>
+
+<div class="filters-bar" id="filters">
+  <div class="fg">
+    <label>BDM</label>
+    <select id="fC"><option value="">Todos</option></select>
+  </div>
+  <div class="fg">
+    <label>Directora</label>
+    <select id="fD"><option value="">Todas</option></select>
+  </div>
+  <div class="fg" style="max-width:230px">
+    <label>Buscar CNS (nombre o código)</label>
+    <input type="text" id="fN" placeholder="Ej: Maria Lopez o 1405...">
+  </div>
+  <div class="fg" style="max-width:120px">
+    <label>Bono</label>
+    <select id="fB"><option value="">Todos</option></select>
+  </div>
+  <div class="fg" style="max-width:140px">
+    <label>Estado Pago</label>
+    <select id="fP"><option value="">Todos</option></select>
+  </div>
+  <button class="btn-clear" onclick="clearF()">✕ Limpiar</button>
+</div>
+
+<div class="tw" id="tableWrap">
+  <table>
+    <thead><tr>
+      <th>Cód. CNS</th>
+      <th>Nombre CNS</th>
+      <th>Bono</th>
+      <th>Logra Mov.</th>
+      <th>Ganancia</th>
+      <th>Valor Bono</th>
+      <th>Estado Pago</th>
+      <th>Motivo No Pago</th>
+      <th>Fecha Pago</th>
+      <th>Medio Pago</th>
+    </tr></thead>
+    <tbody id="tb"></tbody>
+  </table>
+  <div class="nr" id="nr" style="display:none">
+    <span>🔍</span>Sin resultados para los filtros aplicados.
+  </div>
+</div>
+
+<script>
+// ── CSV parser (no dependencies) ──────────────────────────────────────────────
+function parseCSV(text) {
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  const headers = splitCSVLine(lines[0]);
+  return lines.slice(1).map(line => {
+    const vals = splitCSVLine(line);
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = (vals[i] || '').trim());
+    return obj;
+  });
+}
+
+function splitCSVLine(line) {
+  const result = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQ && line[i+1] === '"') { cur += '"'; i++; }
+      else inQ = !inQ;
+    } else if (ch === ',' && !inQ) {
+      result.push(cur); cur = '';
+    } else {
+      cur += ch;
+    }
+  }
+  result.push(cur);
+  return result;
+}
+
+// ── Load CSV ──────────────────────────────────────────────────────────────────
+let D = [];
+
+fetch('atc_data.csv')
+  .then(r => {
+    if (!r.ok) throw new Error('No se pudo cargar atc_data.csv');
+    return r.text();
+  })
+  .then(text => {
+    D = parseCSV(text);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('filters').style.display = 'flex';
+    document.getElementById('tableWrap').style.display = 'block';
+    initFilters();
+    run();
+  })
+  .catch(err => {
+    document.getElementById('loading').innerHTML =
+      `<div class="error-msg"><span>⚠️</span>Error al cargar los datos.<br><small>${err.message}</small></div>`;
+  });
+
+// ── Filters ───────────────────────────────────────────────────────────────────
+function uniq(arr, k) {
+  return [...new Set(arr.map(r => r[k]).filter(v => v))].sort();
+}
+function fill(id, vals) {
+  const e = document.getElementById(id);
+  vals.forEach(v => {
+    const o = document.createElement('option');
+    o.value = v; o.textContent = v;
+    e.appendChild(o);
+  });
+}
+
+function initFilters() {
+  fill('fC', uniq(D, 'Nombre Coordinador'));
+  fill('fD', uniq(D, 'Nombre DIR'));
+  fill('fB', uniq(D, 'Bono por el que Participa (Estatus Objetivo)'));
+  fill('fP', uniq(D, 'Estado Pago'));
+}
+
+function cascade() {
+  const c = document.getElementById('fC').value;
+  const f = c ? D.filter(x => x['Nombre Coordinador'] === c) : D;
+  const ds = document.getElementById('fD'), dv = ds.value;
+  ds.innerHTML = '<option value="">Todas</option>';
+  uniq(f, 'Nombre DIR').forEach(v => {
+    const o = document.createElement('option');
+    o.value = v; o.textContent = v;
+    if (v === dv) o.selected = true;
+    ds.appendChild(o);
+  });
+  run();
+}
+
+document.getElementById('fC').addEventListener('change', cascade);
+['fD','fB','fP'].forEach(id => document.getElementById(id).addEventListener('change', run));
+document.getElementById('fN').addEventListener('input', run);
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function bc(v, t) {
+  if (t === 'b') return v === 'ASP' ? 'bASP' : 'bCEMS';
+  if (t === 'p') {
+    const m = { 'Pagado':'bPAG', 'Procesando':'bPROC', 'Saldo a Favor':'bSAF', 'No Pagado':'bNOP' };
+    return m[v] || 'bPEN';
+  }
+  const m = { JNR:'bJNR', SSE:'bSSE', SEN:'bSEN', REG:'bREG' };
+  return m[v] || 'bDEF';
+}
+
+function run() {
+  const fC = document.getElementById('fC').value;
+  const fD = document.getElementById('fD').value;
+  const fN = document.getElementById('fN').value.toLowerCase().trim();
+  const fB = document.getElementById('fB').value;
+  const fP = document.getElementById('fP').value;
+
+  const rows = D.filter(r => {
+    if (fC && r['Nombre Coordinador'] !== fC) return false;
+    if (fD && r['Nombre DIR'] !== fD) return false;
+    if (fN && !r['Nombre CNS'].toLowerCase().includes(fN) && !r['Cod. CNS'].includes(fN)) return false;
+    if (fB && r['Bono por el que Participa (Estatus Objetivo)'] !== fB) return false;
+    if (fP && r['Estado Pago'] !== fP) return false;
+    return true;
+  });
+
+  const tb = document.getElementById('tb');
+  const nr = document.getElementById('nr');
+
+  if (!rows.length) {
+    tb.innerHTML = '';
+    nr.style.display = 'block';
+    return;
+  }
+  nr.style.display = 'none';
+
+  tb.innerHTML = rows.map(r => {
+    const val = r['Valor del Bono'];
+    const valDisplay = (!val || val === '0') ? '—' : '$ ' + parseInt(val).toLocaleString();
+    const logra = r['Camp. Logra la Movilización'] || '—';
+    const fecha = r['Fecha Pago'] || '—';
+    const medio = r['Medio de Pago'] || '—';
+    const motivo = r['Motivo de no Pago'] || '—';
+    return `<tr>
+      <td style="color:#777;font-size:12px">${r['Cod. CNS']}</td>
+      <td style="font-weight:500">${r['Nombre CNS']}</td>
+      <td><span class="b ${bc(r['Bono por el que Participa (Estatus Objetivo)'],'b')}">${r['Bono por el que Participa (Estatus Objetivo)']}</span></td>
+      <td style="text-align:center;color:#555">${logra}</td>
+      <td style="text-align:center">${r['Tiene Ganancia de la Camp. que logra la Movilización'] || '—'}</td>
+      <td style="text-align:right;font-weight:600;color:#DC582A">${valDisplay}</td>
+      <td><span class="b ${bc(r['Estado Pago'],'p')}">${r['Estado Pago'] || '—'}</span></td>
+      <td style="font-size:12px;max-width:200px;white-space:normal;color:#555">${motivo}</td>
+      <td style="font-size:12px;color:#666">${fecha}</td>
+      <td style="font-size:12px;color:#666">${medio}</td>
+    </tr>`;
+  }).join('');
+}
+
+function clearF() {
+  ['fC','fD','fB','fP'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fN').value = '';
+  cascade();
+}
+</script>
+</body>
+</html>
